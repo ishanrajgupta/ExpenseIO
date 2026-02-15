@@ -4,7 +4,7 @@ const cors = require('cors');
 const colors = require('colors');
 const connectDB = require('./config/db');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
-
+//mongodb+srv://expenseuser:4op2LqlNbAptyQzJ@cluster0.wpbtcrv.mongodb.net/expense-tracker?retryWrites=true&w=majority
 // Connect to database
 connectDB();
 
