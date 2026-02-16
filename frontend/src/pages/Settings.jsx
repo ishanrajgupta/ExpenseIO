@@ -15,18 +15,34 @@ const Settings = () => {
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear password error when user types
+    if (e.target.name === 'password' || e.target.name === 'confirmPassword') {
+      setPasswordError('');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
+    // Validate passwords if user is trying to change password
+    if (formData.password || formData.confirmPassword) {
+      if (formData.password !== formData.confirmPassword) {
+        setPasswordError('Passwords do not match');
+        toast.error('Passwords do not match');
+        return;
+      }
+      if (formData.password.length < 6) {
+        setPasswordError('Password must be at least 6 characters');
+        toast.error('Password must be at least 6 characters');
+        return;
+      }
     }
+    
+    setPasswordError('');
 
     setLoading(true);
     try {
@@ -45,6 +61,7 @@ const Settings = () => {
       updateUser(data.data);
       toast.success('Profile updated successfully');
       setFormData({ ...formData, password: '', confirmPassword: '' });
+      setPasswordError('');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update profile');
       console.error(error);
@@ -184,10 +201,13 @@ const Settings = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="input-field"
+                className={`input-field ${passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 placeholder="Confirm new password"
                 minLength="6"
               />
+              {passwordError && (
+                <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+              )}
             </div>
           </div>
         </div>

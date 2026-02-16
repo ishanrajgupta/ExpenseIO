@@ -215,31 +215,36 @@ const recalculateBudgetSpent = async (budget) => {
 const checkBudgetAlerts = (budget) => {
   const alerts = [];
 
-  // Check total budget
-  const totalPercentage = (budget.totalSpent / budget.totalBudget) * 100;
+  // Check total budget - only if budget is set and greater than 0
+  if (budget.totalBudget && budget.totalBudget > 0) {
+    const totalPercentage = (budget.totalSpent / budget.totalBudget) * 100;
 
-  if (totalPercentage >= 100) {
-    alerts.push({
-      type: 'danger',
-      level: 'total',
-      message: `You have exceeded your total monthly budget by ${(
-        totalPercentage - 100
-      ).toFixed(1)}%`,
-      percentage: totalPercentage,
-    });
-  } else if (totalPercentage >= 80) {
-    alerts.push({
-      type: 'warning',
-      level: 'total',
-      message: `You have used ${totalPercentage.toFixed(
-        1
-      )}% of your monthly budget`,
-      percentage: totalPercentage,
-    });
+    if (totalPercentage >= 100) {
+      alerts.push({
+        type: 'danger',
+        level: 'total',
+        message: `You have exceeded your total monthly budget by ${(
+          totalPercentage - 100
+        ).toFixed(1)}%`,
+        percentage: totalPercentage,
+      });
+    } else if (totalPercentage >= 80) {
+      alerts.push({
+        type: 'warning',
+        level: 'total',
+        message: `You have used ${totalPercentage.toFixed(
+          1
+        )}% of your monthly budget`,
+        percentage: totalPercentage,
+      });
+    }
   }
 
   // Check category budgets
   budget.categoryBudgets.forEach((catBudget) => {
+    // Only calculate if limit is set and greater than 0
+    if (!catBudget.limit || catBudget.limit <= 0) return;
+    
     const percentage = (catBudget.spent / catBudget.limit) * 100;
 
     if (percentage >= 100 && !catBudget.alertSent100) {
